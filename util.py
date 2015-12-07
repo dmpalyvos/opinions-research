@@ -162,7 +162,7 @@ def barabasi_albert(N, M, seed, verbose=True):
     '''
 
     A_nx = nx.barabasi_albert_graph(N, M, seed=seed)
-    A = np.array(nx.adj_matrix(A_nx))
+    A = nx.adj_matrix(A_nx).toarray()
 
     if verbose:
         print('Barbasi-Albert Network Created: N = {N}, '
@@ -188,9 +188,10 @@ def from_edgelist(path, delimiter=' '):
         number of nodes
 
     '''
-
+    if not os.path.isfile(path):
+        raise NameError
     G = nx.read_edgelist(path, delimiter=delimiter, nodetype=int)
-    A = np.array(nx.adj_matrix(G))
+    A = nx.adjacency_matrix(G).toarray()
     N = A.shape[0]
     return A, N
 

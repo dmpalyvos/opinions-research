@@ -61,7 +61,7 @@ def deGroot(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     opinions[0, :] = s
 
     for t in trange(1, max_rounds):
-        z = np.dot(A, z)
+        z = A.dot(z)
         opinions[t, :] = z
         if conv_stop and \
            norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
@@ -114,7 +114,7 @@ def friedkinJohnsen(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     opinions[0, :] = z
 
     for t in trange(1, max_rounds):
-        z = np.dot(A_model, z) + np.dot(B, s)
+        z = A_model.dot(z) + B.dot(s)
         opinions[t, :] = z
         if conv_stop and \
            norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
@@ -353,7 +353,7 @@ def ga(A, B, s, max_rounds, eps=1e-6, conv_stop=True, save=False, **kwargs):
         Q = rowStochastic(Q)
         B_temp = np.diag(np.diag(Q))
         Q = Q - B_temp
-        z = np.dot(Q, z) + np.dot(B_temp, s)
+        z = Q.dot(z) + B_temp.dot(s)
         opinions[t, :] = z
         if conv_stop and \
            norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
@@ -721,7 +721,7 @@ def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
     for t in trange(1, max_rounds):
         Q = np.zeros((N, N))
         # TODO: Verify that this contains the original paths of A
-        A_squared = np.dot(A_model, A_model)
+        A_squared = A_model.dot(A_model)
         for i in range(N):
             # Find 2-neighbors in the underlying social network
             neighbor2_i = A_squared[i, :] > 0
@@ -794,7 +794,7 @@ def kNN_dynamic_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
     for t in trange(1, max_rounds):
         Q = np.zeros((N, N))
         # TODO: Verify that this contains the original paths of A
-        A_squared = np.dot(A_model, A_model)
+        A_squared = A_model.dot(A_model)
         for i in range(N):
             # Find 2-neighbors in the underlying social network
             neighbor2_i = A_squared[i, :] > 0

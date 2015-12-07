@@ -10,9 +10,7 @@ import models
 from util import gnp, barabasi_albert, from_edgelist, rowStochastic
 
 rand.seed(1233)
-#A, N = from_edgelist('./networks/facebook_combined.txt')
-N = 2000 
-A = gnp(N,0.02)
+A, N = from_edgelist('./networks/facebook_combined.txt')
 A = rowStochastic(A)
 s = rand.rand(N)
 max_rounds = 1000
