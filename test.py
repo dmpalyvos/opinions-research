@@ -18,7 +18,7 @@ max_rounds = 1000
 B = diag(rand.rand(N)) * 0.5
 #models.deGroot(A, s, max_rounds)
 models.friedkinJohnsen(A, s, max_rounds, conv_stop=False)
-#models.meetFriend(A, s, 1e5, conv_stop=False)
+#models.meetFriend_nomem(A, s, 1e5, conv_stop=False)
 #models.hk(s, 0.07, max_rounds, eps=1e-8, plot=True)
 #models.hk_local(A, s, 0.07, max_rounds, eps=1e-8, plot=True)
 #models.ga(A, B, s, max_rounds, plot=True, save=True)

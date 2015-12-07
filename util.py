@@ -162,7 +162,7 @@ def barabasi_albert(N, M, seed, verbose=True):
     '''
 
     A_nx = nx.barabasi_albert_graph(N, M, seed=seed)
-    A = nx.adj_matrix(A_nx).toarray()
+    A = nx.adjacency_matrix(A_nx).toarray()
 
     if verbose:
         print('Barbasi-Albert Network Created: N = {N}, '
