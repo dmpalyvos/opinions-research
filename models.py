@@ -11,9 +11,8 @@ import numpy as np
 from numpy.linalg import norm
 from datetime import datetime
 
-#from viz import plotOpinions
 from util import rchoice, rowStochastic, saveModelData
-from tqdm import tqdm, trange
+from tqdm import trange
 
 
 def preprocessArgs(s, max_rounds):
@@ -30,8 +29,7 @@ def preprocessArgs(s, max_rounds):
     return N, z, max_rounds
 
 
-def deGroot(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
-            save=False):
+def deGroot(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the DeGroot Model.
 
     Runs a maximum of max_rounds rounds of the DeGroot model. If the model
@@ -46,8 +44,6 @@ def deGroot(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
@@ -72,9 +68,6 @@ def deGroot(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
             print('DeGroot converged after {t} rounds'.format(t=t))
             break
 
-    if plot:
-        plotOpinions(opinions[0:t+1, :], 'DeGroot')
-
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'dg' + timeStr
@@ -85,8 +78,7 @@ def deGroot(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
     return opinions[0:t+1, :]
 
 
-def friedkinJohnsen(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
-                    save=False):
+def friedkinJohnsen(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the Friedkin-Johnsen (Kleinberg) Model.
 
     Runs a maximum of max_rounds rounds of the Friedkin-Jonsen model. If the
@@ -102,8 +94,6 @@ def friedkinJohnsen(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
@@ -131,9 +121,6 @@ def friedkinJohnsen(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
             print('Friedkin-Johnsen converged after {t} rounds'.format(t=t))
             break
 
-    if plot:
-        plotOpinions(opinions[0:t+1, :], 'Friedkin-Johnsen')
-
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'fj' + timeStr
@@ -144,8 +131,7 @@ def friedkinJohnsen(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
     return opinions[0:t+1, :]
 
 
-def meetFriend(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
-               save=False):
+def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the Friedkin-Johnsen (Kleinberg) Model.
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
@@ -161,8 +147,6 @@ def meetFriend(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
@@ -200,9 +184,6 @@ def meetFriend(A, s, max_rounds, eps=1e-6, plot=False, conv_stop=True,
             print('Meet a Friend converged after {t} rounds'.format(t=t))
             break
 
-    if plot:
-        plotOpinions(opinions[0:t+1, :], 'Meet a friend')
-
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'mf' + timeStr
@@ -232,8 +213,6 @@ def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True):
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
@@ -319,8 +298,7 @@ def dynamic_weights(A, s, z, c, eps, p):
     return Q
 
 
-def ga(A, B, s, max_rounds, eps=1e-6, plot=False, conv_stop=True, save=False,
-       **kwargs):
+def ga(A, B, s, max_rounds, eps=1e-6, conv_stop=True, save=False, **kwargs):
     '''Simulates the Generalized Asymmetric Coevolutionary Game.
 
     This model does nto require an adjacency matrix. Connections between
@@ -339,8 +317,6 @@ def ga(A, B, s, max_rounds, eps=1e-6, plot=False, conv_stop=True, save=False,
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
@@ -384,9 +360,6 @@ def ga(A, B, s, max_rounds, eps=1e-6, plot=False, conv_stop=True, save=False,
             print('G-A converged after {t} rounds'.format(t=t))
             break
 
-    if plot:
-        plotOpinions(opinions[0:t+1, :], 'Hegselmann-Krause', dcolor=True)
-
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'ga' + timeStr
@@ -397,8 +370,7 @@ def ga(A, B, s, max_rounds, eps=1e-6, plot=False, conv_stop=True, save=False,
     return opinions[0:t+1, :]
 
 
-def hk(s, op_eps, max_rounds, eps=1e-6, plot=False, conv_stop=True,
-       save=False):
+def hk(s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the model of Hegselmann-Krause.
 
     This model does nto require an adjacency matrix. Connections between
@@ -413,8 +385,6 @@ def hk(s, op_eps, max_rounds, eps=1e-6, plot=False, conv_stop=True,
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
@@ -444,9 +414,6 @@ def hk(s, op_eps, max_rounds, eps=1e-6, plot=False, conv_stop=True,
             print('Hegselmann-Krause converged after {t} rounds'.format(t=t))
             break
 
-    if plot:
-        plotOpinions(opinions[0:t+1, :], 'Hegselmann-Krause', dcolor=True)
-
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hk' + timeStr
@@ -457,8 +424,7 @@ def hk(s, op_eps, max_rounds, eps=1e-6, plot=False, conv_stop=True,
     return opinions[0:t+1, :]
 
 
-def hk_local(A, s, op_eps, max_rounds, eps=1e-6, plot=False, conv_stop=True,
-             save=False):
+def hk_local(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the model of Hegselmann-Krause with an Adjacency Matrix.
 
     Contrary to the standard Hegselmann-Krause Model, here we make use of
@@ -476,8 +442,6 @@ def hk_local(A, s, op_eps, max_rounds, eps=1e-6, plot=False, conv_stop=True,
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
@@ -515,9 +479,6 @@ def hk_local(A, s, op_eps, max_rounds, eps=1e-6, plot=False, conv_stop=True,
             print('Hegselmann-Krause (Local Knowledge) converged after {t} '
                   'rounds'.format(t=t))
             break
-
-    if plot:
-        plotOpinions(opinions[0:t+1, :], 'Hegselmann-Krause', dcolor=True)
 
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
@@ -589,8 +550,7 @@ def hk_local_nomem(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True):
     return t, z
 
 
-def kNN_static(A, s, K, max_rounds, eps=1e-6, plot=False, conv_stop=True,
-               save=False):
+def kNN_static(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the static K-Nearest Neighbors Model.
 
     In this model, each node chooses his K-Nearest Neighbors during the
@@ -650,9 +610,6 @@ def kNN_static(A, s, K, max_rounds, eps=1e-6, plot=False, conv_stop=True,
             print('K-Nearest Neighbors (static) converged after {t} '
                   'rounds'.format(t=t))
             break
-
-    if plot:
-        plotOpinions(opinions[0:t+1, :], 'K-NN Static', dcolor=True)
 
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
@@ -723,8 +680,7 @@ def kNN_static_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
     return t, z
 
 
-def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, plot=False, conv_stop=True,
-                save=False):
+def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the dynamic K-Nearest Neighbors Model.
 
     In this model, each nodes chooses his K-Nearest Neighbors during the
@@ -742,8 +698,6 @@ def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, plot=False, conv_stop=True,
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
@@ -791,9 +745,6 @@ def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, plot=False, conv_stop=True,
                   'rounds'.format(t=t))
             break
 
-    if plot:
-        plotOpinions(opinions[0:t+1, :], 'K-NN Dynamic', dcolor=True)
-
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'kNNd' + timeStr
@@ -821,8 +772,6 @@ def kNN_dynamic_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
 
         eps (double): Maximum difference between rounds before we assume that
         the model has converged (default: 1e-6)
-
-        plot (bool): Plot preference (default: False)
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
