@@ -9,11 +9,12 @@ from __future__ import division, print_function
 
 import numpy as np
 from numpy.linalg import norm
-from datetime import datetime
+import scipy.sparse as sparse
 
-from util import rchoice, rowStochastic, saveModelData
+from datetime import datetime
 from tqdm import trange
 
+from util import rchoice, rowStochastic, saveModelData
 
 def preprocessArgs(s, max_rounds):
     '''Argument processing common for most models.
@@ -345,11 +346,14 @@ def ga(A, B, s, max_rounds, eps=1e-6, conv_stop=True, save=False, **kwargs):
 
     N, z, max_rounds = preprocessArgs(s, max_rounds)
 
+    # The matrix contains 0/1 values
+    A_model = A.astype(np.int8)
+
     opinions = np.zeros((max_rounds, N))
     opinions[0, :] = s
 
     for t in trange(1, max_rounds):
-        Q = dynamic_weights(A, s, z, c, eps_c, p_c) + B
+        Q = dynamic_weights(A_model, s, z, c, eps_c, p_c) + B
         Q = rowStochastic(Q)
         B_temp = np.diag(np.diag(Q))
         Q = Q - B_temp
@@ -457,6 +461,9 @@ def hk_local(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
 
     # All nodes must listen to themselves for the averaging to work
     A_model = A + np.eye(N)
+
+    # The matrix contains 0/1 values
+    A_model = A_model.astype(np.int8)
 
     z_prev = z.copy()
     opinions = np.zeros((max_rounds, N))
@@ -585,6 +592,9 @@ def kNN_static(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
     # All nodes must listen to themselves for the averaging to work
     A_model = A + np.eye(N)
 
+    # The matrix contains 0/1 values
+    A_model = A_model.astype(np.int8)
+
     z_prev = z.copy()
     opinions = np.zeros((max_rounds, N))
     opinions[0, :] = s
@@ -654,22 +664,27 @@ def kNN_static_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
     # All nodes must listen to themselves for the averaging to work
     A_model = A + np.eye(N)
 
+    # The matrix contains 0/1 values
+    A_model = A_model.astype(np.int8)
+
     z_prev = z.copy()
 
     for t in trange(1, max_rounds):
-        for i in range(N):
+        Q = np.zeros((N, N))
+        for i in xrange(N):
             # Find neighbors in the underlying social network
             neighbor_i = A_model[i, :] > 0
             # Sort the nodes by opinion distance
             sorted_dist = np.argsort(abs(z_prev - z_prev[i]))
-            # Change the order of the logican neighbor_i array
+            # Change the order of the logical neighbor_i array
             neighbor_i = neighbor_i[sorted_dist]
             # Keep only sorted neighbors
             friends_i = sorted_dist[neighbor_i]
             # In case that we have less than K friends numpy
             # will return the whole array (< K elements)
             k_nearest = friends_i[0:K]
-            z[i] = np.mean(z_prev[k_nearest])
+            Q[i, k_nearest] = 1/k_nearest.size
+        z = Q.dot(z_prev)
         if conv_stop and \
            norm(z - z_prev, np.inf) < eps:
             print('K-Nearest Neighbors (static) converged after {t} '
@@ -713,6 +728,9 @@ def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
 
     # All nodes must listen to themselves for the averaging to work
     A_model = A + np.eye(N)
+
+    # The matrix contains 0/1 values
+    A_model = A_model.astype(np.int8)
 
     z_prev = z.copy()
     opinions = np.zeros((max_rounds, N))
@@ -788,6 +806,9 @@ def kNN_dynamic_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
 
     # All nodes must listen to themselves for the averaging to work
     A_model = A + np.eye(N)
+
+    # The matrix contains 0/1 values
+    A_model = A_model.astype(np.int8)
 
     z_prev = z.copy()
 

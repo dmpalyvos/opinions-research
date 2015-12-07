@@ -36,7 +36,6 @@ def rchoice(weights):
     positive_probs = np.nonzero(weights)[0]
     s = 0.0
     r = rand.random()
-
     for i in positive_probs:
         s += weights[i]
         if r <= s:
