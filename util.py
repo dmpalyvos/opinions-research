@@ -207,7 +207,7 @@ def saveModelData(simid, **kwargs):
     if not os.path.isdir('results'):
         os.mkdir('./results')
         print('Created /results directory')
-    os.chdir('./results')
+    #os.chdir('./results')
 
     print('Saving simulation data [{0}]'.format(simid))
 
@@ -224,10 +224,10 @@ def saveModelData(simid, **kwargs):
     # Save the arrays used in the simulation
     for name, data in kwargs.iteritems():
         if type(data) == np.ndarray:
-            np.savetxt('{simid}_{name}.txt'.format(simid=simid, name=name),
+            np.savetxt('./results/{simid}_{name}.txt'.format(simid=simid, name=name),
                        data, fmt='%6.4f')
         else:
             metadata[name] = data
 
-    with open('{0}_metadata.txt'.format(simid), 'w') as metadata_file:
+    with open('./results/{0}_metadata.txt'.format(simid), 'w') as metadata_file:
         json.dump(metadata, metadata_file, indent=4)

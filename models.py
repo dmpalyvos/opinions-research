@@ -8,6 +8,7 @@ Models of Opinion Formation
 from __future__ import division, print_function
 
 import numpy as np
+import numpy.random as rand
 from numpy.linalg import norm, inv
 
 from datetime import datetime
@@ -316,7 +317,8 @@ def rand_matrices(A, t):
     return A_t, B_t
 
 
-def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
+def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False,
+                      simid=None):
     '''Simulates the random meeting model (matrix version).
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
@@ -334,14 +336,20 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
 
         norm_type: The norm type used to calculate the difference from the
         equilibrium
-        
+
         save (bool): Save the simulation data into text files
+
+        simid (string): Used when save=True to identify the simulation in the
+        filename.
 
     Returns:
         A vector containing the norm distances from the equlibrium of the
         Friedkin-Johnsen model.
 
     '''
+
+    max_rounds = int(max_rounds)
+
     N = A.shape[0]
     B = np.diag(np.diag(A))
     equilibrium_matrix = np.dot(inv(np.eye(N) - (A - B)), B)
@@ -353,8 +361,6 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
         distances[t-2] = norm(R - equilibrium_matrix, ord=norm_type)
 
     if save:
-        timeStr = datetime.now().strftime("%m%d%H%M")
-        simid = 'mfm' + timeStr
         saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=max_rounds, A=A, distances=distances,
                       norm=norm_type)
