@@ -74,7 +74,7 @@ def randomSpanningTree(N, rand_weights=False):
     nodes = rand.permutation(N)
     A = np.zeros((N, N))
 
-    for i in range(1, N):
+    for i in xrange(1, N):
         w = rand.random() if rand_weights else 1
         A[nodes[i - 1], nodes[i]] = w
         A[nodes[i], nodes[i - 1]] = w
@@ -124,8 +124,8 @@ def gnp(N, p, rand_weights=False, verbose=True):
     '''
 
     A = randomSpanningTree(N)
-    for i in range(N):
-        for j in range(N):
+    for i in xrange(N):
+        for j in xrange(N):
             r = rand.random()
             if r < p:
                 w = rand.random() if rand_weights else 1
@@ -195,7 +195,7 @@ def from_edgelist(path, delimiter=' '):
     return A, N
 
 
-def expectedEquilibrium(A, s):
+def expected_equilibrium(A, s):
     '''Calculates the equilibrium of the Friedkin-Johnsen Model
 
     Args:

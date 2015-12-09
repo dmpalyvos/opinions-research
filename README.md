@@ -7,7 +7,7 @@ This is an ongoing research project in the National Technical University of Athe
 The following python packages are required to simulate the models:
 - numpy
 - scipy
-- networkx (network creation/display)
+- networkx ~1.10 (network creation/display)
 - tqdm (progress reporting)
 The following packages are needed if you want to use extra features (plots/parallel processing):
 - matplotlib

@@ -8,13 +8,13 @@ Models of Opinion Formation
 from __future__ import division, print_function
 
 import numpy as np
-from numpy.linalg import norm
-import scipy.sparse as sparse
+from numpy.linalg import norm, inv
 
 from datetime import datetime
 from tqdm import trange
 
 from util import rchoice, rowStochastic, saveModelData
+
 
 def preprocessArgs(s, max_rounds):
     '''Argument processing common for most models.
@@ -133,7 +133,7 @@ def friedkinJohnsen(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
 
 
 def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
-    '''Simulates the Friedkin-Johnsen (Kleinberg) Model.
+    '''Simulates the random meeting model.
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
     model converges sooner, the function returns. The stubborness matrix of
@@ -178,7 +178,7 @@ def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
             else:
                 op = z_prev[r_i]
             z[i] = (op + t*z_prev[i]) / (t+1)
-        z_prev = z
+        z_prev = z.copy()
         opinions[t, :] = z
         if conv_stop and \
            norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
@@ -196,7 +196,7 @@ def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
 
 
 def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True):
-    '''Simulates the Friedkin-Johnsen (Kleinberg) Model.
+    '''Simulates the random meeting model.
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
     model converges sooner, the function returns. The stubborness matrix of
@@ -247,6 +247,75 @@ def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True):
         z_prev = z.copy()
 
     return t, z
+
+
+def rand_matrices(A, t):
+    '''Create random matrices A, B for the meetFriend_matrix model.
+
+    The matrices are created as follows. A_t has a diagonal of (t-1)/t and B_t
+    is the zero matrix. We make a weighted random choice for each node
+    depending on the values of its row on A matrix. Depending on the outcome
+    of this choice, either the B[i, i] = 1/t or A[i, r] = 1/t, where r is the
+    random choice.
+
+    Args:
+        A (NxN numpy array): Weights matrix (its diagonal is the stubborness)
+
+        t (int): Round number
+
+    Returns:
+        Two NxN matrices, A_t and B_t
+
+    '''
+
+    N = A.shape[0]
+    A_t = np.eye(N) * (t-1)/t
+    B_t = np.zeros((N, N))
+    for i in xrange(N):
+        r = rchoice(A[i, :])
+        if r == i:
+            B_t[i, i] = 1/t
+        else:
+            A_t[i, r] = 1/t
+
+    return A_t, B_t
+
+
+def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2):
+    '''Simulates the random meeting model (matrix version).
+
+    Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
+    model converges sooner, the function returns. The stubborness matrix of
+    the model is extracted from the diagonal of matrix A. The function returns
+    the distance from the equilibrium of the Friedkin-Johnsen over time.
+
+    Args:
+        A (NxN numpy array): Weights matrix (its diagonal is the stubborness)
+
+        max_rounds (int): Maximum number of rounds to simulate
+
+        eps (double): Maximum difference between rounds before we assume that
+        the model has converged (default: 1e-6)
+
+        norm_type: The norm type used to calculate the difference from the
+        equilibrium
+
+    Returns:
+        A vector containing the norm distances from the equlibrium of the
+        Friedkin-Johnsen model.
+
+    '''
+    N = A.shape[0]
+    B = np.diag(np.diag(A))
+    equilibrium_matrix = np.dot(inv(np.eye(N) - (A - B)), B)
+    R, _ = rand_matrices(A, 1)
+    distances = np.zeros(max_rounds)
+    for t in trange(2, max_rounds):
+        A_t, B_t = rand_matrices(A, t)
+        R = A_t.dot(R) + B_t
+        distances[t-2] = norm(R - equilibrium_matrix, ord=norm_type)
+
+    return distances[:-2]
 
 
 def dynamic_weights(A, s, z, c, eps, p):
