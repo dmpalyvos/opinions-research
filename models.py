@@ -13,7 +13,7 @@ from numpy.linalg import norm, inv
 from datetime import datetime
 from tqdm import trange
 
-from util import rchoice, rowStochastic, saveModelData
+from util import rowStochastic, saveModelData
 
 
 def preprocessArgs(s, max_rounds):
@@ -131,6 +131,33 @@ def friedkinJohnsen(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
 
     return opinions[0:t+1, :]
 
+
+def rchoice(weights):
+    '''Makes a (weighted) random choice.
+
+    Given a vector of probabilities with a total sum of 1, this function
+    returns the index of one element of the list with probability equal to
+    this element's value. For example, given the vector [0.2, 0.5, 0.3], the
+    probability that the function returns 0 is 20%, the probability that
+    the functions returns 1 is 50% and the probability that it returns 2
+    is 30%.
+
+    Args:
+        weights (1xN array): The vector with the probability of each index
+
+    Returns:
+        The randomly chosen index
+    '''
+
+    positive_probs = np.nonzero(weights)[0]
+    s = 0.0
+    r = rand.random()
+    for i in positive_probs:
+        s += weights[i]
+        if r <= s:
+            return i
+
+    raise RuntimeError('Failed to make a random choice. Check input vector.')
 
 def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the random meeting model.
