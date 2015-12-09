@@ -222,7 +222,7 @@ def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     return opinions[0:t+1, :]
 
 
-def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True):
+def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the random meeting model.
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
@@ -244,6 +244,8 @@ def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True):
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
+
+        save (bool): Save the simulation data into text files
 
     Returns:
         t, z where t is the convergence time and z the vector of the
@@ -272,6 +274,12 @@ def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True):
             print('Meet a Friend converged after {t} rounds'.format(t=t))
             break
         z_prev = z.copy()
+
+    if save:
+        timeStr = datetime.now().strftime("%m%d%H%M")
+        simid = 'mf' + timeStr
+        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+                      rounds_run=t+1, A=A, s=s, opinions=z)
 
     return t, z
 
@@ -308,7 +316,7 @@ def rand_matrices(A, t):
     return A_t, B_t
 
 
-def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2):
+def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
     '''Simulates the random meeting model (matrix version).
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
@@ -326,6 +334,8 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2):
 
         norm_type: The norm type used to calculate the difference from the
         equilibrium
+        
+        save (bool): Save the simulation data into text files
 
     Returns:
         A vector containing the norm distances from the equlibrium of the
@@ -337,12 +347,19 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2):
     equilibrium_matrix = np.dot(inv(np.eye(N) - (A - B)), B)
     R, _ = rand_matrices(A, 1)
     distances = np.zeros(max_rounds)
-    for t in trange(2, max_rounds):
+    for t in trange(2, max_rounds+2):
         A_t, B_t = rand_matrices(A, t)
         R = A_t.dot(R) + B_t
         distances[t-2] = norm(R - equilibrium_matrix, ord=norm_type)
 
-    return distances[:-2]
+    if save:
+        timeStr = datetime.now().strftime("%m%d%H%M")
+        simid = 'mfm' + timeStr
+        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+                      rounds_run=max_rounds, A=A, distances=distances,
+                      norm=norm_type)
+
+    return distances
 
 
 def dynamic_weights(A, s, z, c, eps, p):
@@ -593,7 +610,8 @@ def hk_local(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     return opinions[0:t+1, :]
 
 
-def hk_local_nomem(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True):
+def hk_local_nomem(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True,
+                   save=False):
     '''Simulates the model of Hegselmann-Krause with an Adjacency Matrix
 
     Contrary to the standard Hegselmann-Krause Model, here we make use of
@@ -617,6 +635,8 @@ def hk_local_nomem(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True):
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
 
+        save (bool): Save the simulation data into text files
+
     Returns:
         t, z where t is the convergence time and z the vector of the
         final opinions.
@@ -629,8 +649,6 @@ def hk_local_nomem(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True):
     A_model = A + np.eye(N)
 
     z_prev = z.copy()
-    opinions = np.zeros((max_rounds, N))
-    opinions[0, :] = s
 
     for t in trange(1, max_rounds):
         for i in range(N):
@@ -642,13 +660,18 @@ def hk_local_nomem(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True):
             # which is close to his own
             friends_i = np.logical_and(neighbor_i, opinion_close)
             z[i] = np.mean(z_prev[friends_i])
-        opinions[t, :] = z
         if conv_stop and \
            norm(z - z_prev, np.inf) < eps:
             print('Hegselmann-Krause (Local Knowledge) converged after {t} '
                   'rounds'.format(t=t))
             break
         z_prev = z.copy()
+
+    if save:
+        timeStr = datetime.now().strftime("%m%d%H%M")
+        simid = 'hkloc' + timeStr
+        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+                      rounds_run=t+1, A=A, s=s, op_eps=op_eps, opinions=z)
 
     return t, z
 
@@ -727,7 +750,8 @@ def kNN_static(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
     return opinions[0:t+1, :]
 
 
-def kNN_static_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
+def kNN_static_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True,
+                     save=False):
     '''Simulates the static K-Nearest Neighbors Model. Reduced memory usage.
 
     In this model, each nodes chooses his K-Nearest Neighbors during the
@@ -748,6 +772,8 @@ def kNN_static_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
 
         conv_stop (bool): Stop the simulation if the model has converged
         (default: True)
+
+        save (bool): Save the simulation data into text files
 
     Returns:
         t, z where t is the convergence time and z the vector of the
@@ -788,7 +814,13 @@ def kNN_static_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
             break
         z_prev = z.copy()
 
-    return t, z
+    if save:
+        timeStr = datetime.now().strftime("%m%d%H%M")
+        simid = 'kNNs' + timeStr
+        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+                      rounds_run=t+1, A=A, s=s, K=K, opinions=z, Q=Q)
+
+    return t, z, Q
 
 
 def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
@@ -869,7 +901,8 @@ def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
     return opinions[0:t+1, :]
 
 
-def kNN_dynamic_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
+def kNN_dynamic_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True,
+                      save=False):
     '''Simulates the dynamic K-Nearest Neighbors Model. Reduced Memory.
 
     In this model, each nodes chooses his K-Nearest Neighbors during the
@@ -933,5 +966,11 @@ def kNN_dynamic_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True):
                   'rounds'.format(t=t))
             break
         z_prev = z.copy()
+
+    if save:
+        timeStr = datetime.now().strftime("%m%d%H%M")
+        simid = 'kNNd' + timeStr
+        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+                      rounds_run=t+1, A=A, s=s, K=K, opinions=z, Q=Q)
 
     return t, z, Q
