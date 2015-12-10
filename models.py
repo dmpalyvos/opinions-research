@@ -361,6 +361,8 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False,
         distances[t-2] = norm(R - equilibrium_matrix, ord=norm_type)
 
     if save:
+        timeStr = datetime.now().strftime("%m%d%H%M")
+        simid = 'mf' + timeStr
         saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=max_rounds, A=A, distances=distances,
                       norm=norm_type)
