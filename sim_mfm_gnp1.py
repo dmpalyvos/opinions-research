@@ -24,7 +24,7 @@ if __name__ == '__main__':
     print('[*] N = {0}'.format(N))
 
     print('[*] Creating Networks...')
-    p_list = np.arange(0.0, 1.0, 0.05)
+    p_list = np.arange(0.0, 1.0, 0.1)
     A_matrices = [gnp(N, p) for p in p_list]
     B = diag(rand.rand(N))
     networks = [rowStochastic(A+B) for A in A_matrices]

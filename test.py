@@ -12,11 +12,11 @@ import matplotlib.pyplot as plt
 
 rand.seed(1233)
 #A, N = from_edgelist('./networks/facebook_combined.txt')
-N = 100
+N = 128
 A = gnp(N, 0.1)
 A = rowStochastic(A)
 s = rand.rand(N)
-max_rounds = 100
+max_rounds = 10000
 #A = gnp(N, 0.12, rand_weights=True)
 B = diag(rand.rand(N)) * 0.5
 #models.deGroot(A, s, max_rounds)

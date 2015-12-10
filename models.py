@@ -13,7 +13,7 @@ from numpy.linalg import norm, inv
 
 from datetime import datetime
 from tqdm import trange
-
+import sys
 from util import rowStochastic, saveModelData
 
 
@@ -359,7 +359,7 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False,
         A_t, B_t = rand_matrices(A, t)
         R = A_t.dot(R) + B_t
         distances[t-2] = norm(R - equilibrium_matrix, ord=norm_type)
-
+        sys.stdout.flush()
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'mf' + timeStr
