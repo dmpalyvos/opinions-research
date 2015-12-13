@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 rand.seed(1233)
 #A, N = from_edgelist('./networks/facebook_combined.txt')
-N = 128
-A = gnp(N, 0.1)
+N = 1024
+A = gnp(N, 0.03)
 A = rowStochastic(A)
 s = rand.rand(N)
 max_rounds = 10000

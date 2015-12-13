@@ -9,6 +9,7 @@ from __future__ import division, print_function
 
 import numpy as np
 import numpy.random as rand
+import scipy.sparse as sparse
 from numpy.linalg import norm, inv
 
 from datetime import datetime
@@ -133,7 +134,7 @@ def friedkinJohnsen(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     return opinions[0:t+1, :]
 
 
-def rchoice(weights):
+def rchoice(weights, nonzero_ids):
     '''Makes a (weighted) random choice.
 
     Given a vector of probabilities with a total sum of 1, this function
@@ -146,14 +147,16 @@ def rchoice(weights):
     Args:
         weights (1xN array): The vector with the probability of each index
 
+        nonzero_ids (numpy array): Places where the weights vector is not
+        zero.
+
     Returns:
         The randomly chosen index
     '''
 
-    positive_probs = np.nonzero(weights)[0]
     s = 0.0
     r = rand.random()
-    for i in positive_probs:
+    for i in nonzero_ids:
         s += weights[i]
         if r <= s:
             return i
@@ -190,6 +193,8 @@ def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
 
     N, z, max_rounds = preprocessArgs(s, max_rounds)
 
+    nonzero_ids = [np.nonzero(A[i, :])[0] for i in xrange(A.shape[0])]
+
     z_prev = z.copy()
     opinions = np.zeros((max_rounds, N))
     opinions[0, :] = s
@@ -201,7 +206,7 @@ def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     for t in trange(1, max_rounds):
         # Update the opinion for each node
         for i in range(N):
-            r_i = rchoice(A[i, :])
+            r_i = rchoice(A[i, :], nonzero_ids[i])
             if r_i == i:
                 op = s[i]
             else:
@@ -257,6 +262,8 @@ def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
 
     N, z, max_rounds = preprocessArgs(s, max_rounds)
 
+    nonzero_ids = [np.nonzero(A[i, :])[0] for i in xrange(A.shape[0])]
+
     z_prev = z.copy()
 
     if np.size(np.nonzero(A.sum(axis=1))) != N:
@@ -265,7 +272,7 @@ def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     for t in trange(1, max_rounds):
         # Update the opinion for each node
         for i in range(N):
-            r_i = rchoice(A[i, :])
+            r_i = rchoice(A[i, :], nonzero_ids[i])
             if r_i == i:
                 op = s[i]
             else:
@@ -286,7 +293,7 @@ def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     return t, z
 
 
-def rand_matrices(A, t):
+def rand_matrices(A, t, nonzero_ids):
     '''Create random matrices A, B for the meetFriend_matrix model.
 
     The matrices are created as follows. A_t has a diagonal of (t-1)/t and B_t
@@ -306,16 +313,17 @@ def rand_matrices(A, t):
     '''
 
     N = A.shape[0]
-    A_t = np.eye(N) * (t-1)/t
-    B_t = np.zeros((N, N))
+    A_t = sparse.lil_matrix((N, N))
+    A_t.setdiag(np.ones(N) * (t-1)/t)
+    B_t = sparse.lil_matrix((N, N))
     for i in xrange(N):
-        r = rchoice(A[i, :])
+        r = rchoice(A[i, :], nonzero_ids[i])
         if r == i:
             B_t[i, i] = 1/t
         else:
             A_t[i, r] = 1/t
 
-    return A_t, B_t
+    return A_t.tocsr(), B_t.tocsr()
 
 
 def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
@@ -344,16 +352,19 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
         Friedkin-Johnsen model.
 
     '''
-
+    # TODO: Correct intialization of R matrix
     max_rounds = int(max_rounds)
 
     N = A.shape[0]
     B = np.diag(np.diag(A))
+
+    nonzero_ids = [np.nonzero(A[i, :])[0] for i in xrange(A.shape[0])]
+
     equilibrium_matrix = np.dot(inv(np.eye(N) - (A - B)), B)
-    R, _ = rand_matrices(A, 1)
+    R, _ = rand_matrices(A, 1, nonzero_ids)
     distances = np.zeros(max_rounds)
     for t in trange(2, max_rounds+2):
-        A_t, B_t = rand_matrices(A, t)
+        A_t, B_t = rand_matrices(A, t, nonzero_ids)
         R = A_t.dot(R) + B_t
         distances[t-2] = norm(R - equilibrium_matrix, ord=norm_type)
 
@@ -399,11 +410,14 @@ def meetFriend_matrix_nomem(A, max_rounds, eps=1e-6, norm_type=2, save=False):
 
     N = A.shape[0]
     B = np.diag(np.diag(A))
+
+    nonzero_ids = [np.nonzero(A[i, :])[0] for i in xrange(A.shape[0])]
+
     equilibrium_matrix = np.dot(inv(np.eye(N) - (A - B)), B)
-    R, _ = rand_matrices(A, 1)
+    R, _ = rand_matrices(A, 1, nonzero_ids)
 
     for t in trange(2, max_rounds+2):
-        A_t, B_t = rand_matrices(A, t)
+        A_t, B_t = rand_matrices(A, t, nonzero_ids)
         R = A_t.dot(R) + B_t
 
     distance = norm(R - equilibrium_matrix, ord=norm_type)
