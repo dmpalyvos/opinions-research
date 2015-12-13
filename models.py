@@ -13,7 +13,7 @@ from numpy.linalg import norm, inv
 
 from datetime import datetime
 from tqdm import trange
-import sys
+
 from util import rowStochastic, saveModelData
 
 
@@ -159,6 +159,7 @@ def rchoice(weights):
             return i
 
     raise RuntimeError('Failed to make a random choice. Check input vector.')
+
 
 def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the random meeting model.
@@ -317,8 +318,7 @@ def rand_matrices(A, t):
     return A_t, B_t
 
 
-def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False,
-                      simid=None):
+def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
     '''Simulates the random meeting model (matrix version).
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
@@ -339,9 +339,6 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False,
 
         save (bool): Save the simulation data into text files
 
-        simid (string): Used when save=True to identify the simulation in the
-        filename.
-
     Returns:
         A vector containing the norm distances from the equlibrium of the
         Friedkin-Johnsen model.
@@ -359,7 +356,7 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False,
         A_t, B_t = rand_matrices(A, t)
         R = A_t.dot(R) + B_t
         distances[t-2] = norm(R - equilibrium_matrix, ord=norm_type)
-        sys.stdout.flush()
+
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'mf' + timeStr
@@ -368,6 +365,57 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False,
                       norm=norm_type)
 
     return distances
+
+
+def meetFriend_matrix_nomem(A, max_rounds, eps=1e-6, norm_type=2, save=False):
+    '''Simulates the random meeting model (matrix version).
+
+    Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
+    model converges sooner, the function returns. The stubborness matrix of
+    the model is extracted from the diagonal of matrix A. The function returns
+    the distance from the equilibrium of the Friedkin-Johnsen when the process
+    is complete. Uses less memory than the full model.
+
+    Args:
+        A (NxN numpy array): Weights matrix (its diagonal is the stubborness)
+
+        max_rounds (int): Maximum number of rounds to simulate
+
+        eps (double): Maximum difference between rounds before we assume that
+        the model has converged (default: 1e-6)
+
+        norm_type: The norm type used to calculate the difference from the
+        equilibrium
+
+        save (bool): Save the simulation data into text files
+
+    Returns:
+        The final distance from the equlibrium of the Friedkin-Johnsen model,
+        using the specified norm.
+
+    '''
+
+    max_rounds = int(max_rounds)
+
+    N = A.shape[0]
+    B = np.diag(np.diag(A))
+    equilibrium_matrix = np.dot(inv(np.eye(N) - (A - B)), B)
+    R, _ = rand_matrices(A, 1)
+
+    for t in trange(2, max_rounds+2):
+        A_t, B_t = rand_matrices(A, t)
+        R = A_t.dot(R) + B_t
+
+    distance = norm(R - equilibrium_matrix, ord=norm_type)
+
+    if save:
+        timeStr = datetime.now().strftime("%m%d%H%M")
+        simid = 'mf' + timeStr
+        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+                      rounds_run=max_rounds, A=A, distance=distance,
+                      norm=norm_type)
+
+    return distance
 
 
 def dynamic_weights(A, s, z, c, eps, p):
