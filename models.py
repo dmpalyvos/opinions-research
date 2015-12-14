@@ -352,7 +352,7 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
         Friedkin-Johnsen model.
 
     '''
-    # TODO: Correct intialization of R matrix
+
     max_rounds = int(max_rounds)
 
     N = A.shape[0]
@@ -599,6 +599,71 @@ def hk(s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
         if conv_stop and \
            norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
             print('Hegselmann-Krause converged after {t} rounds'.format(t=t))
+            break
+
+    if save:
+        timeStr = datetime.now().strftime("%m%d%H%M")
+        simid = 'hk' + timeStr
+        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+                      rounds_run=t+1, s=s, op_eps=op_eps,
+                      opinions=opinions[0:t+1, :])
+
+    return opinions[0:t+1, :]
+
+
+def hk_rand(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
+    '''Simulate the model of Hegselmann-Krause with random sampling.
+
+    In each round every node chooses K other nodes uniformly at random and
+    updates his opinion to be the average of the opinions of those K nodes
+    that have a opinion distance at most equal to op_eps.
+
+    Args:
+        s (1xN numpy array): Initial opinions (intrinsic beliefs) vector
+
+        K (int): The number of nodes which will be randomly chosen in each
+        round.
+
+        op_eps: ε parameter of the model
+
+        max_rounds (int): Maximum number of rounds to simulate
+
+        eps (double): Maximum difference between rounds before we assume that
+        the model has converged (default: 1e-6)
+
+        conv_stop (bool): Stop the simulation if the model has converged
+        (default: True)
+
+        save (bool): Save the simulation data into text files
+
+    Returns:
+        A txN vector of the opinions of the nodes over time
+
+    '''
+    N, z, max_rounds = preprocessArgs(s, max_rounds)
+
+    z_prev = z.copy()
+    opinions = np.zeros((max_rounds, N))
+    opinions[0, :] = s
+
+    for t in trange(1, max_rounds):
+        for i in range(N):
+            # Choose K random nodes as temporary "neighbors"
+            rand_sample = rand.randint(0, N, K)
+            neighbors_i = np.zeros(N, dtype=bool)
+            neighbors_i[rand_sample] = 1
+            # Always choose yourself
+            neighbors_i[i] = 1
+            # The node chooses only those with a close enough opinion
+            friends_i = np.abs(z_prev - z_prev[i]) <= op_eps
+            friends_i = np.logical_and(neighbors_i, friends_i)
+            z[i] = np.mean(z_prev[friends_i])
+        opinions[t, :] = z
+        z_prev = z.copy()
+        if conv_stop and \
+           norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
+            print('Hegselmann-Krause (random) converged after {t}'
+                  'rounds'.format(t=t))
             break
 
     if save:

@@ -11,7 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from numpy.linalg import norm
-from util import expectedEquilibrium
+from util import expected_equilibrium
 import networkx as nx
 import seaborn as sns
 
@@ -91,7 +91,7 @@ def plotDistance(A, s, opinions):
 
     '''
 
-    eq = expectedEquilibrium(A, s)
+    eq = expected_equilibrium(A, s)
     dist = norm(opinions - eq, axis=1)
     plt.plot(range(dist.size), dist)
     plt.xlim(0, dist.size)
