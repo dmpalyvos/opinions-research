@@ -663,7 +663,7 @@ def hk_rand(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
         if conv_stop and \
            norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
             print('Hegselmann-Krause (random) converged after {t}'
-                  'rounds'.format(t=t))
+                  ' rounds'.format(t=t))
             break
 
     if save:

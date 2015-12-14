@@ -71,6 +71,34 @@ def meanDegree(A):
     return np.mean(degrees)
 
 
+def cluster_count(x, eps=0.1):
+    '''Calculates the number of clusters in HK-type models.
+
+    The function creates a histogram from the given vector and returns
+    the number of bins that contain a non-trivial percentage of the values.
+    For normal runs of HK models, this is equal to the number of the clusters.
+
+    We have determined that len(x)/10 seems to be a good number for the
+    initial number of bins. If you encouter errors, you might want to
+    experiment with it.
+
+    Args:
+        x (1xN numpy array): The input vector
+
+        eps (float): The threshold for accepting a bin. If the bin contains
+        more than eps * (size of largest bin) values, then we count it as
+        a cluster.
+
+    Returns:
+        The number of clusters.
+    '''
+    if (len(x.shape) > 1):
+        raise ValueError('Please provide a 1-D numpy array')
+    bins, _ = np.histogram(x, bins=len(x)/10)
+    cluster_bins = bins > eps * bins.max()
+    return np.sum(cluster_bins)
+
+
 def gnp(N, p, rand_weights=False, verbose=True):
     '''Constructs an connected undirected  G(N, p) network with random weights.
 

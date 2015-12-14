@@ -9,6 +9,7 @@ import models
 from viz import plotNetwork, plotOpinions
 from util import gnp, barabasi_albert, from_edgelist, rowStochastic
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 rand.seed(1233)
 #A, N = from_edgelist('./networks/facebook_combined.txt')
@@ -35,3 +36,4 @@ op1 = models.hk_rand(s, N, 0.1, max_rounds)
 op2 = models.hk(s, 0.1, max_rounds)
 plotOpinions(op1, dcolor=True)
 plotOpinions(op2, dcolor=True)
+sns.clustermap(op1)
