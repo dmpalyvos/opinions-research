@@ -18,8 +18,12 @@ from ipyparallel import Client
 from numpy.linalg import inv
 from datetime import datetime
 
+__all__ = ['row_stochastic', 'mean_degree', 'gnp', 'barabasi_albert',
+           'cluster_count', 'from_edgelist', 'expected_equilibrium',
+           'save_data', 'parallel_init', 'parallel_map']
 
-def rowStochastic(A):
+
+def row_stochastic(A):
     '''Makes a matrix row (right) stochastic.
 
     Given a real square matrix, returns a new matrix which is right
@@ -35,7 +39,7 @@ def rowStochastic(A):
     return A / A.sum(axis=1, keepdims=True)
 
 
-def randomSpanningTree(N, rand_weights=False):
+def rand_spanning_tree(N, rand_weights=False):
     '''Creats a graph of N nodes connected by a random spanning tree.
 
     Args:
@@ -57,7 +61,7 @@ def randomSpanningTree(N, rand_weights=False):
     return A
 
 
-def meanDegree(A):
+def mean_degree(A):
     '''Calculates the mean degree of a graph.
 
     Args:
@@ -126,7 +130,7 @@ def gnp(N, p, rand_weights=False, verbose=True):
 
     '''
 
-    A = randomSpanningTree(N)
+    A = rand_spanning_tree(N)
     for i in xrange(N):
         for j in xrange(N):
             r = rand.random()
@@ -137,10 +141,10 @@ def gnp(N, p, rand_weights=False, verbose=True):
 
     if verbose:
         print('G(N,p) Network Created: N = {N}, Mean Degree = {deg}'.format(
-              N=N, deg=meanDegree(A)))
+              N=N, deg=mean_degree(A)))
 
     if rand_weights:
-        A = rowStochastic(A)
+        A = row_stochastic(A)
 
     return A
 
@@ -168,7 +172,7 @@ def barabasi_albert(N, M, seed, verbose=True):
 
     if verbose:
         print('Barbasi-Albert Network Created: N = {N}, '
-              'Mean Degree = {deg}'.format(N=N, deg=meanDegree(A)))
+              'Mean Degree = {deg}'.format(N=N, deg=mean_degree(A)))
 
     return A
 
@@ -217,7 +221,7 @@ def expected_equilibrium(A, s):
     return np.dot(np.dot(inv(np.eye(N) - (A - B)), B), s)
 
 
-def saveModelData(simid, **kwargs):
+def save_data(simid, **kwargs):
     '''Save the initial conditions and the results of a simulation
 
     Args:

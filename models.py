@@ -15,7 +15,7 @@ from numpy.linalg import norm, inv
 from datetime import datetime
 from tqdm import trange
 
-from util import rowStochastic, saveModelData
+from util import row_stochastic, save_data
 
 
 def preprocessArgs(s, max_rounds):
@@ -74,7 +74,7 @@ def deGroot(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'dg' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s,
                       opinions=opinions[0:t+1, :])
 
@@ -127,7 +127,7 @@ def friedkinJohnsen(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'fj' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s,
                       opinions=opinions[0:t+1, :])
 
@@ -222,7 +222,7 @@ def meetFriend(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'mf' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s,
                       opinions=opinions[0:t+1, :])
 
@@ -287,7 +287,7 @@ def meetFriend_nomem(A, s, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'mf' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s, opinions=z)
 
     return t, z
@@ -371,7 +371,7 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'mf' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=max_rounds, A=A, distances=distances,
                       norm=norm_type)
 
@@ -425,7 +425,7 @@ def meetFriend_matrix_nomem(A, max_rounds, eps=1e-6, norm_type=2, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'mf' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=max_rounds, A=A, distance=distance,
                       norm=norm_type)
 
@@ -537,7 +537,7 @@ def ga(A, B, s, max_rounds, eps=1e-6, conv_stop=True, save=False, **kwargs):
 
     for t in trange(1, max_rounds):
         Q = dynamic_weights(A_model, s, z, c, eps_c, p_c) + B
-        Q = rowStochastic(Q)
+        Q = row_stochastic(Q)
         B_temp = np.diag(np.diag(Q))
         Q = Q - B_temp
         z = Q.dot(z) + B_temp.dot(s)
@@ -550,7 +550,7 @@ def ga(A, B, s, max_rounds, eps=1e-6, conv_stop=True, save=False, **kwargs):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'ga' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s, B=B, c=c, eps_c=eps_c,
                       p_c=p_c, opinions=opinions[0:t+1, :])
 
@@ -604,7 +604,7 @@ def hk(s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hk' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, s=s, op_eps=op_eps,
                       opinions=opinions[0:t+1, :])
 
@@ -669,7 +669,7 @@ def hk_rand(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hk' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, s=s, op_eps=op_eps,
                       opinions=opinions[0:t+1, :])
 
@@ -738,7 +738,7 @@ def hk_local(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hkloc' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s, op_eps=op_eps,
                       opinions=opinions[0:t+1, :])
 
@@ -805,7 +805,7 @@ def hk_local_nomem(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True,
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hkloc' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s, op_eps=op_eps, opinions=z)
 
     return t, z
@@ -878,7 +878,7 @@ def kNN_static(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'kNNs' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s, K=K,
                       opinions=opinions[0:t+1, :])
 
@@ -952,7 +952,7 @@ def kNN_static_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True,
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'kNNs' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s, K=K, opinions=z, Q=Q)
 
     return t, z, Q
@@ -1029,7 +1029,7 @@ def kNN_dynamic(A, s, K, max_rounds, eps=1e-6, conv_stop=True, save=False):
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'kNNd' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s, K=K,
                       opinions=opinions[0:t+1, :])
 
@@ -1105,7 +1105,7 @@ def kNN_dynamic_nomem(A, s, K, max_rounds, eps=1e-6, conv_stop=True,
     if save:
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'kNNd' + timeStr
-        saveModelData(simid, N=N, max_rounds=max_rounds, eps=eps,
+        save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
                       rounds_run=t+1, A=A, s=s, K=K, opinions=z, Q=Q)
 
     return t, z, Q

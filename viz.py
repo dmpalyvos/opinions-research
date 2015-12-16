@@ -16,7 +16,10 @@ import networkx as nx
 import seaborn as sns
 
 
-def plotNetwork(A, s, k=0.2, node_size=40, iterations=500):
+__all__ = ['plot_network', 'plot_opinions', 'plot_distance']
+
+
+def plot_network(A, s, k=0.2, node_size=40, iterations=500):
     '''Plot the network graph. Not final yet.
     '''
 
@@ -39,7 +42,7 @@ def plotNetwork(A, s, k=0.2, node_size=40, iterations=500):
         plt.show()
 
 
-def plotOpinions(opinions, title='', dcolor=False, interp=True):
+def plot_opinions(opinions, title='', dcolor=False, interp=True):
     '''Creates a plot of the opinions over time
 
     Args:
@@ -76,7 +79,7 @@ def plotOpinions(opinions, title='', dcolor=False, interp=True):
     plt.show()
 
 
-def plotDistance(A, s, opinions):
+def plot_distance(A, s, opinions):
     '''Plots the distance of the opinions from the expected equilibrium
 
     Creates a plot of the distance from the expected equilibrium of the

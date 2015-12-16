@@ -6,8 +6,7 @@ import numpy.random as rand
 from numpy.linalg import norm, inv
 
 import models
-from viz import plotNetwork, plotOpinions
-from util import gnp, barabasi_albert, from_edgelist, rowStochastic
+from util import *
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -15,7 +14,7 @@ rand.seed(1233)
 #A, N = from_edgelist('./networks/facebook_combined.txt')
 N = 512
 A = gnp(N, 0.03)
-A = rowStochastic(A)
+A = row_stochastic(A)
 s = rand.rand(N)
 max_rounds = 1000
 #A = gnp(N, 0.12, rand_weights=True)
@@ -31,7 +30,7 @@ B = diag(rand.rand(N)) * 0.5
 #plotNetwork(Q, z, node_size=10, iterations=50)
 #plotNetwork(A, op[-1,:])
 #models.kNN_dynamic_nomem(A, s, 10, max_rounds)
-#dist = models.meetFriend_matrix(rowStochastic(A+B), max_rounds)
+#dist = models.meetFriend_matrix(row_stochastic(A+B), max_rounds)
 op1 = models.hk_rand(s, N, 0.1, max_rounds)
 op2 = models.hk(s, 0.1, max_rounds)
 plotOpinions(op1, dcolor=True)
