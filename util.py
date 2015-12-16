@@ -291,7 +291,7 @@ def parallel_init(wdir, profile=None, variables=None):
     print('[*] {0} parallel engines available'.format(len(v)))
     directview.map_sync(os.chdir, [wdir] * len(v))
     print('[*] Finished setting working directories')
-    return v
+    return v, directview
 
 
 def parallel_map(view, func, in_list):
