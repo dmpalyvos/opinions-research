@@ -103,7 +103,7 @@ def cluster_count(x, eps=0.1, bin_num=None):
         raise ValueError('Please provide a 1-D numpy array')
     if bin_num is None:
         bin_num = len(x)
-    hist_bins = np.histogram(x, bins=len(x)/10)[0]
+    hist_bins = np.histogram(x, bins=bin_num)[0]
     cluster_bins = hist_bins > eps * hist_bins.max()
     return np.sum(cluster_bins)
 
