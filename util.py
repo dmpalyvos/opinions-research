@@ -11,7 +11,10 @@ import numpy.random as rand
 import networkx as nx
 import json
 import os
+import sys
 
+from tqdm import tqdm
+from ipyparallel import Client
 from numpy.linalg import inv
 from datetime import datetime
 
@@ -259,3 +262,56 @@ def saveModelData(simid, **kwargs):
 
     with open('./results/{0}_metadata.txt'.format(simid), 'w') as metadata_file:
         json.dump(metadata, metadata_file, indent=4)
+
+
+def parallel_init(wdir, profile=None, variables=None):
+    '''Initiallize ipyparallel cluster
+
+    Args:
+        wdir: The working directory of the project
+
+        profile: The ipyparallel profile to use. If None, use the default.
+
+        variables: A dictionary of variables that will be set in each engine.
+
+    Returns:
+        A balanced view object
+
+    '''
+
+    c = Client(profile=profile)
+    directview = c[:]
+    if variables is not None:
+        directview.push(variables)
+    v = c.load_balanced_view()
+    print('[*] {0} parallel engines available'.format(len(v)))
+    directview.map_sync(os.chdir, [wdir] * len(v))
+    print('[*] Finished setting working directories')
+    return v
+
+
+def parallel_map(view, func, in_list):
+    '''Run a function in parallel
+
+    Args:
+        view: An ipyparallel balanced view
+
+        func: The function to be run
+
+        in_list: The list that the function will be mapped to
+
+    Returns:
+        The resulting list of the map
+    '''
+
+    # Run asynchronously
+    async_res = view.map(func, in_list)
+    # Show progress
+    print('[*] Running simulation. Do not interrupt this process!')
+    sys.stdout.flush()
+    t = tqdm(total=len(in_list))
+    for i, _ in enumerate(async_res):
+        t.update()
+    t.close()
+    print('[*] Done!')
+    return list(async_res)
