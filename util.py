@@ -296,7 +296,7 @@ def parallel_init(wdir, profile=None, variables=None):
     return v, directview
 
 
-def parallel_map(view, func, in_list):
+def parallel_map(view, func, in_list, silent=False):
     '''Run a function in parallel
 
     Args:
@@ -312,6 +312,8 @@ def parallel_map(view, func, in_list):
 
     # Run asynchronously
     async_res = view.map(func, in_list)
+    if silent:
+        return list(async_res.get())
     # Show progress
     print('[*] Running simulation. Do not interrupt this process!')
     sys.stdout.flush()
