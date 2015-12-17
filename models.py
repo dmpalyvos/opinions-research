@@ -9,6 +9,7 @@ from __future__ import division, print_function
 
 import numpy as np
 import numpy.random as rand
+import random as stdrand
 import scipy.sparse as sparse
 from numpy.linalg import norm, inv
 
@@ -649,7 +650,7 @@ def hk_rand(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     for t in trange(1, max_rounds):
         for i in range(N):
             # Choose K random nodes as temporary "neighbors"
-            rand_sample = rand.randint(0, N, K)
+            rand_sample = np.array(stdrand.sample(range(N), K))
             neighbors_i = np.zeros(N, dtype=bool)
             neighbors_i[rand_sample] = 1
             # Always choose yourself
@@ -670,8 +671,8 @@ def hk_rand(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hk' + timeStr
         save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
-                      rounds_run=t+1, s=s, op_eps=op_eps,
-                      opinions=opinions[0:t+1, :])
+                  rounds_run=t+1, s=s, op_eps=op_eps,
+                  opinions=opinions[0:t+1, :])
 
     return opinions[0:t+1, :]
 
@@ -739,8 +740,8 @@ def hk_local(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hkloc' + timeStr
         save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
-                      rounds_run=t+1, A=A, s=s, op_eps=op_eps,
-                      opinions=opinions[0:t+1, :])
+                  rounds_run=t+1, A=A, s=s, op_eps=op_eps,
+                  opinions=opinions[0:t+1, :])
 
     return opinions[0:t+1, :]
 
@@ -806,7 +807,7 @@ def hk_local_nomem(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True,
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hkloc' + timeStr
         save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
-                      rounds_run=t+1, A=A, s=s, op_eps=op_eps, opinions=z)
+                  rounds_run=t+1, A=A, s=s, op_eps=op_eps, opinions=z)
 
     return t, z
 
