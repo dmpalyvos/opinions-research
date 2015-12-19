@@ -39,7 +39,6 @@ def plot_network(A, s, k=0.2, node_size=40, iterations=500):
                                node_size=node_size, alpha=0.8, cmap=plt.cm.cool)
 
         nx.draw_networkx_edges(graph, pos, width=0.3, alpha=0.4)
-        plt.show()
 
 
 def plot_opinions(opinions, title='', dcolor=False, interp=True):
@@ -76,7 +75,6 @@ def plot_opinions(opinions, title='', dcolor=False, interp=True):
     plt.xlabel('t')
     plt.title(title)
     plt.axis((0, max_rounds, opinions.min() - 0.1, opinions.max() + 0.1))
-    plt.show()
 
 
 def plot_distance(A, s, opinions):
