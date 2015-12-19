@@ -327,7 +327,7 @@ def rand_matrices(A, t, nonzero_ids):
     return A_t.tocsr(), B_t.tocsr()
 
 
-def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
+def meetFriend_matrix(A, max_rounds, norm_type=2, save=False):
     '''Simulates the random meeting model (matrix version).
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
@@ -339,9 +339,6 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
         A (NxN numpy array): Weights matrix (its diagonal is the stubborness)
 
         max_rounds (int): Maximum number of rounds to simulate
-
-        eps (double): Maximum difference between rounds before we assume that
-        the model has converged (default: 1e-6)
 
         norm_type: The norm type used to calculate the difference from the
         equilibrium
@@ -379,7 +376,7 @@ def meetFriend_matrix(A, max_rounds, eps=1e-6, norm_type=2, save=False):
     return distances
 
 
-def meetFriend_matrix_nomem(A, max_rounds, eps=1e-6, norm_type=2, save=False):
+def meetFriend_matrix_nomem(A, max_rounds, norm_type=2, save=False):
     '''Simulates the random meeting model (matrix version).
 
     Runs a maximum of max_rounds rounds of the "Meeting a Friend" model. If the
@@ -392,9 +389,6 @@ def meetFriend_matrix_nomem(A, max_rounds, eps=1e-6, norm_type=2, save=False):
         A (NxN numpy array): Weights matrix (its diagonal is the stubborness)
 
         max_rounds (int): Maximum number of rounds to simulate
-
-        eps (double): Maximum difference between rounds before we assume that
-        the model has converged (default: 1e-6)
 
         norm_type: The norm type used to calculate the difference from the
         equilibrium
@@ -650,7 +644,7 @@ def hk_rand(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     for t in trange(1, max_rounds):
         for i in range(N):
             # Choose K random nodes as temporary "neighbors"
-            rand_sample = np.array(stdrand.sample(range(N), K))
+            rand_sample = np.array(stdrand.sample(xrange(N), K))
             neighbors_i = np.zeros(N, dtype=bool)
             neighbors_i[rand_sample] = 1
             # Always choose yourself
