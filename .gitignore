@@ -60,3 +60,4 @@ networks/
 results/
 .ipynb_checkpoints/
 *.ipynb
+backup/

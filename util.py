@@ -281,7 +281,7 @@ def parallel_init(wdir, profile=None, variables=None):
         variables: A dictionary of variables that will be set in each engine.
 
     Returns:
-        A balanced view object
+        A balanced view and a direct view object.
 
     '''
 

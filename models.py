@@ -359,7 +359,8 @@ def meetFriend_matrix(A, max_rounds, norm_type=2, save=False):
     nonzero_ids = [np.nonzero(A[i, :])[0] for i in xrange(A.shape[0])]
 
     equilibrium_matrix = np.dot(inv(np.eye(N) - (A - B)), B)
-    R, _ = rand_matrices(A, 1, nonzero_ids)
+    R, Q = rand_matrices(A, 1, nonzero_ids)
+    R = R + Q
     distances = np.zeros(max_rounds)
     for t in trange(2, max_rounds+2):
         A_t, B_t = rand_matrices(A, t, nonzero_ids)
@@ -409,7 +410,8 @@ def meetFriend_matrix_nomem(A, max_rounds, norm_type=2, save=False):
     nonzero_ids = [np.nonzero(A[i, :])[0] for i in xrange(A.shape[0])]
 
     equilibrium_matrix = np.dot(inv(np.eye(N) - (A - B)), B)
-    R, _ = rand_matrices(A, 1, nonzero_ids)
+    R, Q = rand_matrices(A, 1, nonzero_ids)
+    R = R + Q
 
     for t in trange(2, max_rounds+2):
         A_t, B_t = rand_matrices(A, t, nonzero_ids)
