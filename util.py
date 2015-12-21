@@ -14,7 +14,7 @@ import os
 import sys
 
 from tqdm import tqdm
-#from ipyparallel import Client
+from ipyparallel import Client
 from numpy.linalg import inv
 from datetime import datetime
 
