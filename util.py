@@ -14,7 +14,7 @@ import os
 import sys
 
 from tqdm import tqdm
-from ipyparallel import Client
+#from ipyparallel import Client
 from numpy.linalg import inv
 from datetime import datetime
 
@@ -134,7 +134,7 @@ def gnp(N, p, rand_weights=False, verbose=True):
 
     A = rand_spanning_tree(N)
     for i in xrange(N):
-        for j in xrange(N):
+        for j in xrange(i+1):
             r = rand.random()
             if r < p:
                 w = rand.random() if rand_weights else 1
