@@ -78,7 +78,7 @@ def mean_degree(A):
     return np.mean(degrees)
 
 
-def cluster_count(x, eps=0.1, bin_num=100):
+def cluster_count(x, eps=0.1, bin_num=101):
     '''Calculates the number of clusters in HK-type models.
 
     The function creates a histogram from the given vector and returns
@@ -96,7 +96,7 @@ def cluster_count(x, eps=0.1, bin_num=100):
         more than eps * (size of largest bin) values, then we count it as
         a cluster.
 
-        bin_num: Number of bins for the histogram. (default: 100)
+        bin_num: Number of bins for the histogram. (default: 101)
 
     Returns:
         The number of clusters.
