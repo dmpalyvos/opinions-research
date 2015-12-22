@@ -95,7 +95,7 @@ def cluster_count(x, eps=0.1, bin_num=100):
         eps (float): The threshold for accepting a bin. If the bin contains
         more than eps * (size of largest bin) values, then we count it as
         a cluster.
-        
+
         bin_num: Number of bins for the histogram. (default: 100)
 
     Returns:

@@ -70,7 +70,7 @@ def plot_opinions(opinions, title='', dcolor=False, interp=True):
                 (x, y) = interpolatePoints(x, y, factor=4)
             colorline(x, y, z=y)
         else:
-            plt.plot(x, y)
+            plt.plot(x, y, label=str(t))
     plt.ylabel('Opinion')
     plt.xlabel('t')
     plt.title(title)
