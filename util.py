@@ -40,7 +40,7 @@ def row_stochastic(A):
 
 
 def rand_spanning_tree(N, rand_weights=False):
-    '''Creats a graph of N nodes connected by a random spanning tree.
+    '''Creats a random minimal tree on N nodes
 
     Args:
         N (int): Number of nodes
@@ -50,15 +50,22 @@ def rand_spanning_tree(N, rand_weights=False):
 
     '''
 
-    nodes = rand.permutation(N)
-    A = np.zeros((N, N))
-
-    for i in xrange(1, N):
-        w = rand.random() if rand_weights else 1
-        A[nodes[i - 1], nodes[i]] = w
-        A[nodes[i], nodes[i - 1]] = w
-
-    return A
+    # Create Random Graph
+    A_rand = rand.rand(N, N)
+    G_rand = nx.Graph()
+    G_rand.add_nodes_from(xrange(N))
+    for i in xrange(N):
+        for j in xrange(i+1):
+            G_rand.add_edge(i, j, weight=A_rand[i, j])
+    # Find minimal spanning tree
+    spanning_tree = nx.minimum_spanning_tree(G_rand)
+    # Create adjacency matrix
+    final_graph = nx.adj_matrix(spanning_tree).toarray()
+    final_graph[final_graph > 0] = 1
+    # Randomize weights if requested
+    if rand_weights:
+        final_graph = final_graph * rand.rand((N, N))
+    return final_graph
 
 
 def mean_degree(A):
