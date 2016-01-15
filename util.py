@@ -64,7 +64,9 @@ def rand_spanning_tree(N, rand_weights=False):
     final_graph[final_graph > 0] = 1
     # Randomize weights if requested
     if rand_weights:
-        final_graph = final_graph * rand.rand((N, N))
+        R = np.tril(rand.rand((N, N)))
+        R = R + np.transpose(R)
+        final_graph = final_graph * R
     return final_graph
 
 
