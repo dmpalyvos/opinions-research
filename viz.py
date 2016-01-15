@@ -24,13 +24,7 @@ def plot_network(A, s, k=0.2, node_size=40, iterations=500):
     '''
 
     graph = nx.Graph()
-    N = A.shape[0]
-    graph.add_nodes_from(range(N))
-    for i in range(N):
-        for j in range(N):
-            if A[i, j] > 0:
-                graph.add_edge(i, j, weight=100*A[i, j])
-
+    graph = nx.from_numpy_matrix(A*100)
     pos = nx.spring_layout(graph, k=k, scale=5.0, iterations=iterations)
     # Draw the nodes and edges
     with sns.axes_style('white'):

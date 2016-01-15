@@ -91,7 +91,7 @@ def cluster_count(x, eps):
     '''Calculates the number of clusters in HK-type models.
 
     Args:
-        x (1xN numpy array): The input vector
+        x (1xN numpy array): Opinions vector
 
         eps (float): The eps parameter of the model
 
@@ -105,6 +105,34 @@ def cluster_count(x, eps):
     diffs = np.abs(np.diff(sorted_opinions))
     cluster_num = np.sum(diffs > eps/2) + 1
     return cluster_num
+
+
+def cluster_count_net(A, x, eps):
+    '''Calculates the number of clusters in HK with network.
+
+    Args:
+        A: Adjacency matrix of the graph.
+
+        x (1xN numpy array): Opinions vector
+
+        eps (float): The eps parameter of the model
+
+    Returns:
+        The number of clusters.
+    '''
+
+    if (len(x.shape) > 1):
+        raise ValueError('Please provide a 1-D numpy array')
+
+    N = A.shape[0]
+    B = A.copy()
+    for i in xrange(N):
+        for j in xrange(i+1):
+            if np.abs(x[i] - x[j]) > eps:
+                B[i, j] = 0
+                B[j, i] = 0
+    G = nx.from_numpy_matrix(B)
+    return nx.number_connected_components(G)
 
 
 def gnp(N, p, rand_weights=False, verbose=True):
