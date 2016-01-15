@@ -20,7 +20,7 @@ from datetime import datetime
 
 __all__ = ['row_stochastic', 'mean_degree', 'gnp', 'barabasi_albert',
            'cluster_count', 'from_edgelist', 'expected_equilibrium',
-           'save_data', 'parallel_init', 'parallel_map']
+           'save_data', 'parallel_init', 'parallel_map', 'cluster_count_net']
 
 
 def row_stochastic(A):
