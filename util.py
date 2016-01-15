@@ -64,7 +64,7 @@ def rand_spanning_tree(N, rand_weights=False):
     final_graph[final_graph > 0] = 1
     # Randomize weights if requested
     if rand_weights:
-        R = np.tril(rand.rand((N, N)))
+        R = np.tril(rand.rand(N, N))
         R = R + np.transpose(R)
         final_graph = final_graph * R
     return final_graph
@@ -100,7 +100,7 @@ def cluster_count(x, eps):
     '''
     if (len(x.shape) > 1):
         raise ValueError('Please provide a 1-D numpy array')
-    
+
     sorted_opinions = np.sort(x)
     diffs = np.abs(np.diff(sorted_opinions))
     cluster_num = np.sum(diffs > eps/2) + 1
