@@ -602,10 +602,71 @@ def hk(s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
         timeStr = datetime.now().strftime("%m%d%H%M")
         simid = 'hk' + timeStr
         save_data(simid, N=N, max_rounds=max_rounds, eps=eps,
-                      rounds_run=t+1, s=s, op_eps=op_eps,
-                      opinions=opinions[0:t+1, :])
+                  rounds_run=t+1, s=s, op_eps=op_eps,
+                  opinions=opinions[0:t+1, :])
 
     return opinions[0:t+1, :]
+
+
+def hk_perturbation(s, op_eps, max_rounds, eps=1e-6, conv_stop=True,
+                    p_points=1, p_max=10):
+    '''Simulates the model of Hegselmann-Krause (with stability test).
+
+    This model does nto require an adjacency matrix. Connections between
+    nodes are calculated depending on the proximity of their opinions. In this
+    variation of the model we randomly choose some 'special' rounds during
+    which the nodes can take into account opinions further than eps from their
+    own.
+
+    Args:
+        s (1xN numpy array): Initial opinions (intrinsic beliefs) vector
+
+        op_eps: ε parameter of the model
+
+        max_rounds (int): Maximum number of rounds to simulate
+
+        eps (double): Maximum difference between rounds before we assume that
+        the model has converged (default: 1e-6)
+
+        conv_stop (bool): Stop the simulation if the model has converged
+        (default: True)
+
+        p_points (int): Number of points where the nodes will see further
+        than op_eps
+
+        p_max (int): Maximum round than can be a perturbation point
+
+    Returns:
+        A txN vector of the opinions of the nodes over time
+
+    '''
+
+    N, z, max_rounds = preprocessArgs(s, max_rounds)
+
+    z_prev = z.copy()
+    opinions = np.zeros((max_rounds, N))
+    opinions[0, :] = s
+    special_rounds = stdrand.sample(xrange(1, p_max), p_points)
+
+    for t in trange(1, max_rounds):
+        round_eps = 2*op_eps if t in special_rounds else op_eps
+        for i in range(N):
+            # The node chooses only those with a close enough opinion
+            friends_i = np.abs(z_prev - z_prev[i]) <= round_eps
+            z[i] = np.mean(z_prev[friends_i])
+        opinions[t, :] = z
+        z_prev = z.copy()
+        if conv_stop and \
+           norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
+            print('Hegselmann-Krause (perturbation) converged after {t} '
+                  'rounds'.format(t=t))
+            break
+
+    # Graphically, the choice seems to 'happen' at the previous round
+    # useful for plots
+    special_rounds = [r-1 for r in special_rounds]
+
+    return opinions[0:t+1, :], special_rounds
 
 
 def hk_rand(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
