@@ -734,6 +734,77 @@ def hk_rand(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     return opinions[0:t+1, :]
 
 
+def hk_rand_perturbation(s, K, op_eps, max_rounds, eps=1e-6, conv_stop=True,
+                         p_points=1, p_max=10):
+    '''Simulate the model of Hegselmann-Krause with random sampling (stability)
+
+    In each round every node chooses K other nodes uniformly at random and
+    updates his opinion to be the average of the opinions of those K nodes
+    that have a opinion distance at most equal to op_eps. In this
+    variation of the model we randomly choose some 'special' rounds during
+    which the nodes can take into account opinions further than eps from their
+    own.
+
+    Args:
+        s (1xN numpy array): Initial opinions (intrinsic beliefs) vector
+
+        K (int): The number of nodes which will be randomly chosen in each
+        round.
+
+        op_eps: ε parameter of the model
+
+        max_rounds (int): Maximum number of rounds to simulate
+
+        eps (double): Maximum difference between rounds before we assume that
+        the model has converged (default: 1e-6)
+
+        conv_stop (bool): Stop the simulation if the model has converged
+        (default: True)
+
+        p_points (int): Number of points where the nodes will see further
+        than op_eps
+
+        p_max (int): Maximum round than can be a perturbation point
+
+    Returns:
+        A txN vector of the opinions of the nodes over time
+
+    '''
+    N, z, max_rounds = preprocessArgs(s, max_rounds)
+
+    z_prev = z.copy()
+    opinions = np.zeros((max_rounds, N))
+    opinions[0, :] = s
+    special_rounds = stdrand.sample(xrange(1, p_max), p_points)
+
+    for t in trange(1, max_rounds):
+        round_eps = 2*op_eps if t in special_rounds else op_eps
+        for i in range(N):
+            # Choose K random nodes as temporary "neighbors"
+            rand_sample = np.array(stdrand.sample(xrange(N), K))
+            neighbors_i = np.zeros(N, dtype=bool)
+            neighbors_i[rand_sample] = 1
+            # Always choose yourself
+            neighbors_i[i] = 1
+            # The node chooses only those with a close enough opinion
+            friends_i = np.abs(z_prev - z_prev[i]) <= round_eps
+            friends_i = np.logical_and(neighbors_i, friends_i)
+            z[i] = np.mean(z_prev[friends_i])
+        opinions[t, :] = z
+        z_prev = z.copy()
+        if conv_stop and \
+           norm(opinions[t - 1, :] - opinions[t, :], np.inf) < eps:
+            print('Hegselmann-Krause (random) converged after {t}'
+                  ' rounds'.format(t=t))
+            break
+
+    # Graphically, the choice seems to 'happen' at the previous round
+    # useful for plots
+    special_rounds = [r-1 for r in special_rounds]
+
+    return opinions[0:t+1, :], special_rounds
+
+
 def hk_local(A, s, op_eps, max_rounds, eps=1e-6, conv_stop=True, save=False):
     '''Simulates the model of Hegselmann-Krause with an Adjacency Matrix.
 
