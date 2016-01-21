@@ -19,7 +19,7 @@ import seaborn as sns
 __all__ = ['plot_network', 'plot_opinions', 'plot_distance']
 
 
-def plot_network(A, s, k=0.2, node_size=40, iterations=500):
+def plot_network(A, s, k=0.2, node_size=40, iterations=500, cmap=plt.cm.cool):
     '''Plot the network graph. Not final yet.
     '''
 
@@ -30,12 +30,13 @@ def plot_network(A, s, k=0.2, node_size=40, iterations=500):
     with sns.axes_style('white'):
         sns.despine()
         nx.draw_networkx_nodes(graph, pos, node_color=s, vmin=0, vmax=1,
-                               node_size=node_size, alpha=0.8, cmap=plt.cm.cool)
+                               node_size=node_size, alpha=0.8, cmap=cmap)
 
         nx.draw_networkx_edges(graph, pos, width=0.3, alpha=0.4)
 
 
-def plot_opinions(opinions, title='', dcolor=False, interp=True):
+def plot_opinions(opinions, title='', dcolor=False, interp=True,
+                  cmap=plt.cm.cool):
     '''Creates a plot of the opinions over time
 
     Args:
@@ -62,7 +63,7 @@ def plot_opinions(opinions, title='', dcolor=False, interp=True):
             # for a smoother plot
             if interp and max_rounds < 100:
                 (x, y) = interpolatePoints(x, y, factor=4)
-            colorline(x, y, z=y)
+            colorline(x, y, z=y, cmap=cmap)
         else:
             plt.plot(x, y, label=str(t))
     plt.ylabel('Opinion')
