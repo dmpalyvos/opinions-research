@@ -36,7 +36,7 @@ def plot_network(A, s, k=0.2, node_size=40, iterations=500, cmap=plt.cm.cool):
 
 
 def plot_opinions(opinions, title='', dcolor=False, interp=True,
-                  cmap=plt.cm.cool):
+                  cmap=plt.cm.cool, linewidth=1.0):
     '''Creates a plot of the opinions over time
 
     Args:
@@ -63,9 +63,9 @@ def plot_opinions(opinions, title='', dcolor=False, interp=True,
             # for a smoother plot
             if interp and max_rounds < 100:
                 (x, y) = interpolatePoints(x, y, factor=4)
-            colorline(x, y, z=y, cmap=cmap)
+            colorline(x, y, z=y, cmap=cmap, linewidth=linewidth)
         else:
-            plt.plot(x, y, label=str(t))
+            plt.plot(x, y, label=str(t), linewidth=linewidth)
     plt.ylabel('Opinion')
     plt.xlabel('t')
     plt.title(title)
