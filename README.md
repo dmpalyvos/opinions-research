@@ -1,7 +1,7 @@
-# Models of Opinion Formation 
+# Opinion Dynamics with Local Interactions ([IJCAI-16](http://ijcai-16.org))
+Dimitris Fotakis, Dimitris Palyvos-Giannas and Stratis Skoulakis
 
-## Purpose
-This is an ongoing research project in the National Technical University of Athens regarding models of opinion formation. We simulate the behavior of various models such as those proposed by DeGroot, Fredkin-Johnsen, Hegselmann-Krause as well as the K-Nearest Neighbors model. We also study how those models behave when we limit the amount of information that each node can access.
+This repository contains the code for the simulations described in the paper.
 
 ## Dependencies
 The following python packages are required to simulate the models:
